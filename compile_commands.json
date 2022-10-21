@@ -1,0 +1,34 @@
+[
+ {
+  "directory": "/home/jeremy/development/unworthy-space-patrol",
+  "arguments": [
+   "cc",
+   "-I./src",
+   "-MMD",
+   "-MP",
+   "-g",
+   "-Wall",
+   "-std=c89",
+   "-pedantic",
+   "-Wextra",
+   "-Wconversion",
+   "-Wcast-align=strict",
+   "-Wcast-qual",
+   "-Wfloat-equal",
+   "-Wundef",
+   "-Wshadow",
+   "-Wpointer-arith",
+   "-Wstrict-prototypes",
+   "-Wstrict-overflow=5",
+   "-Wwrite-strings",
+   "-Waggregate-return",
+   "-Wunreachable-code",
+   "-O2",
+   "-c",
+   "src/main.c",
+   "-o",
+   "build/release/./src/main.c.o"
+  ],
+  "file": "src/main.c"
+ }
+]
