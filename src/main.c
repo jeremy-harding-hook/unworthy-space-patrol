@@ -2,15 +2,44 @@
 #include <curses.h>
 #include <unistd.h>
 #include <locale.h>
-#include "stringing.h"
+#include "engine/engine.h"
 
 #define increment_within_bounds(x,y) (x == (y) ? x = 0 : x++)
 #define decrement_within_bounds(x,y) (x == 0 ? x = (y) : x--)
 #define LAST_COL ((unsigned char)(COLS-1))
 #define LAST_LINE ((unsigned char)(LINES-1))
+
+int handle_game_loop_top(void){
+	register int input_char = getch();
+	switch (input_char)
+	{
+#if FALSE
+		case KEY_LEFT:
+		case 'h':
+			decrement_within_bounds(centre_x, LAST_COL);
+			break;
+		case KEY_RIGHT:
+		case 'l':
+			increment_within_bounds(centre_x, LAST_COL);
+			break;
+		case KEY_UP:
+		case 'k':
+			decrement_within_bounds(centre_y, LAST_LINE);
+			break;
+		case KEY_DOWN:
+		case 'j':
+			increment_within_bounds(centre_y, LAST_LINE);
+			break;
+#endif
+		case 'q':
+		case 'Q':
+			return FALSE;
+	}
+	refresh();
+	return TRUE;
+}
+
 int main(void){
-	unsigned char centre_x;
-	unsigned char centre_y;
 	printf("Starting...\n");
 
 	/* initialise ncurses */
@@ -18,38 +47,23 @@ int main(void){
 	initscr();
 	cbreak();
 	noecho();
+	curs_set(0);
 	keypad(stdscr, TRUE);
-	clear();
+	nodelay(stdscr, TRUE);
 
-	centre_x = LAST_COL/2;
-	centre_y = LAST_LINE/2;
-	mvaddch(centre_y, centre_x, '#');
+	/* run the game */
+	clear();
 	refresh();
-	while(true){
-		register int input_char = getch();
-		mvaddch(centre_y, centre_x, ' ');
-		switch (input_char)
-		{
-			case KEY_LEFT:
-				decrement_within_bounds(centre_x, LAST_COL);
-				break;
-			case KEY_RIGHT:
-				increment_within_bounds(centre_x, LAST_COL);
-				break;
-			case KEY_UP:
-				decrement_within_bounds(centre_y, LAST_LINE);
-				break;
-			case KEY_DOWN:
-				increment_within_bounds(centre_y, LAST_LINE);
-				break;
-			case 'q':
-			case 'Q':
-				goto QUIT;
-		}
-		mvaddch(centre_y, centre_x, '#');
-		refresh();
-	}
-QUIT:
+	game_loop_continue = &handle_game_loop_top;
+	initial_game_object = malloc(sizeof(struct game_object));
+	initial_game_object->character = '#';
+	initial_game_object->next = NULL;
+	initial_game_object->velocity.x = 13;
+	initial_game_object->velocity.y = 17;
+	run_game();
+	free(initial_game_object);
+
+	/* cleanup and exit */
 	endwin();
 	printf("Exiting\n");
 	return 0;

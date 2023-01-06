@@ -15,6 +15,10 @@ CFLAGS = -g -Wall -std=c89 -pedantic -Wextra -Wconversion -Wcast-align=strict \
 		 -Wcast-qual -Wfloat-equal -Wundef -Wshadow -Wpointer-arith \
 		 -Wstrict-prototypes -Wstrict-overflow=5 -Wwrite-strings \
 		 -Waggregate-return -Wunreachable-code
+
+# Tell the engine where the settings file is
+CFLAGS += -D ENGINE_SETTINGS_FILE=\"../engine_settings.h\"
+
 ifeq ($(mode), debug)
 CFLAGS += -O0
 BUILD_DIR := $(BUILD_DIR_BASE)/debug
