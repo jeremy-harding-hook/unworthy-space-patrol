@@ -3,60 +3,18 @@
 
 #include <limits.h>
 #include <time.h>
+#include <curses.h>
 #include "engine.h"
+#include "memory.h"
+#if COLLISION_DETECTION
 #include "collisions.h"
+#endif
 /* TODO: implement main game loop, moving all the objects and checking for
  * collsions. Skip the collision check if not necessary. Also expose a method to
  * check for collisions with a specific game object. */
 
 struct upoint screen_dimensions;
-struct game_object *initial_game_object;
-
-/* TODO: Determine if this is any faster than a normal clear() */
-#if FALSE
-static void clear_objects(struct game_object *object){
-	while(object != NULL){
-		mvaddch(screen_to_board(object->location.y),
-				screen_to_board(object->location.x), ' ');
-		object = object->next;
-	}
-}
-
-#define get_sliver(width) (((UINT_MAX % (width))+1)==(width)?0: \
-		((UINT_MAX % (width))+1))
-/* TODO: Consider replacing all this with an int32 calculation? It would be
- * undoubtedly faster and probably wouldn't use more memory, considering that
- * sliver is already 16 bits at least */
-static unsigned int translate_coordinate(unsigned int location, int velocity,
-		unsigned int screen_dimension){
-	register unsigned int result;
-	if(!screen_dimension)
-		return location + (unsigned)velocity;
-	result = (location + (unsigned)velocity) % screen_dimension;
-	if(velocity < 0)
-		result -= get_sliver(screen_dimension);
-	if(result < location)
-		return result + get_sliver(screen_dimension);
-	return result;
-}
-#undef get_sliver
-
-struct upoint translate_position(struct upoint position,
-		struct point translation){
-#if TRUE
-	position.x = (short unsigned int)((long)position.x + (long)translation.x)
-		% screen_dimensions.x;
-	position.y = (short unsigned int)((long)position.y + (long)translation.y)
-		% screen_dimensions.y;
-#else
-	position.x = translate_coordinate(position.x, translation.x,
-			screen_dimensions.x);
-	position.y = translate_coordinate(position.y, translation.y,
-			screen_dimensions.y);
-#endif
-	return position;
-}
-#endif
+struct game_object *initial_game_object = NULL;
 
 #define translate_position(position, translation) \
 	do{ \
@@ -68,17 +26,21 @@ struct upoint translate_position(struct upoint position,
 
 int (*game_loop_continue)(void);
 
-/* TODO: Convert to macro? */
-void render_game_object(struct game_object *object){
+#define mvaddgobj(object) \
+	mvaddch(screen_to_board(object->location.y), \
+			screen_to_board(object->location.x), \
+			object->character)
+	
 #if COLLISION_DETECTION
-	/* TODO: add the collision detection logic here */
+#define render_game_object(object) \
+	do{ \
+		if(!detect_collision(object)) \
+		mvaddgobj(object); \
+	} while(0)
 #else
-mvaddch(screen_to_board(object->location.y),
-		screen_to_board(object->location.x),
-		object->character);
+#define render_game_object(object) mvaddgobj(object)
 #endif
-}
-
+			
 void run_game(void){
 	struct game_object *current_object;
 	struct timespec clock_delay;
@@ -106,6 +68,9 @@ void run_game(void){
 			render_game_object(current_object);
 			current_object = current_object->next;
 		}
+#if COLLISION_DETECTION
+		resolve_collisions();
+#endif
 		refresh();
 		nanosleep(&clock_delay, NULL);
 	}
