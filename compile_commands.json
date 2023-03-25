@@ -138,5 +138,40 @@
    "build/release/./src/stringing.c.o"
   ],
   "file": "src/stringing.c"
+ },
+ {
+  "directory": "/home/jeremy/development/unworthy-space-patrol",
+  "arguments": [
+   "cc",
+   "-I./src",
+   "-I./src/engine",
+   "-MMD",
+   "-MP",
+   "-g",
+   "-Wall",
+   "-std=c89",
+   "-pedantic",
+   "-Wextra",
+   "-Wconversion",
+   "-Wcast-align=strict",
+   "-Wcast-qual",
+   "-Wfloat-equal",
+   "-Wundef",
+   "-Wshadow",
+   "-Wpointer-arith",
+   "-Wstrict-prototypes",
+   "-Wstrict-overflow=5",
+   "-Wwrite-strings",
+   "-Waggregate-return",
+   "-Wunreachable-code",
+   "-D",
+   "ENGINE_SETTINGS_FILE=\"../engine_settings.h\"",
+   "-O2",
+   "-c",
+   "src/engine/memory.c",
+   "-o",
+   "build/release/./src/engine/memory.c.o"
+  ],
+  "file": "src/engine/memory.c"
  }
 ]

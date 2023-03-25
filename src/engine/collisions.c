@@ -63,7 +63,11 @@ void resolve_collisions(void){
 
 		/* resolve the collision and then discard the old list elements */
 		if(resolve_collision)
-			resolve_collision(first);
+		{
+			mvaddch(screen_to_board(first->object->location.y),
+				screen_to_board(first->object->location.x),
+				resolve_collision(first));
+		}
 		while(first){
 			temp = first->next;
 			ditch_game_object_list_element(first);
